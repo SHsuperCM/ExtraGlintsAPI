@@ -1,14 +1,14 @@
 package shcm.shsupercm.fabric.extraglintsapi.api.v0;
 
 import net.minecraft.util.Identifier;
-import shcm.shsupercm.fabric.extraglintsapi.impl.ExtraGlintsImpl;
+import shcm.shsupercm.fabric.extraglintsapi.impl.ExtraGlintsAPIImpl;
 
 import java.util.Set;
 
 public interface ExtraGlintsAPI {
     static ExtraGlintsAPI getInstance() {
         class Static {
-            public static final ExtraGlintsAPI INSTANCE = new ExtraGlintsImpl();
+            public static final ExtraGlintsAPI INSTANCE = new ExtraGlintsAPIImpl();
         }
         return Static.INSTANCE;
     }
