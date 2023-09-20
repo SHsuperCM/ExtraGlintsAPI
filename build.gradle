@@ -1,0 +1,88 @@
+plugins.apply 'fabric-loom'
+plugins.apply 'io.shcm.shsupercm.fabric.fletchingtable'
+
+version = "${property('mod.version')}+${stonecutter.current().version()}"
+group = 'shcm.shsupercm.fabric.extraglintsapi'
+
+repositories {
+
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${stonecutter.current().version()}"
+    mappings "net.fabricmc:yarn:${property('deps.yarn')}:v2"
+
+    modCompileOnly "net.fabricmc:fabric-loader:${property('deps.fabric-loader')}"
+    modCompileOnly "net.fabricmc.fabric-api:fabric-api:${property('deps.fabric-api')}"
+}
+
+fletchingTable {
+    defaultMixinEnvironment = "client"
+}
+
+loom {
+    accessWidenerPath = file("../../src/main/resources/extraglintsapi.accesswidener")
+
+    runConfigs.client.ideConfigGenerated = false
+    runConfigs.server.ideConfigGenerated = false
+}
+
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+
+    archivesBaseName = property('mod.jarname')
+}
+
+processResources {
+    filesMatching('fabric.mod.json') {
+        expand 'mod_version': version, 'mod_target_mc': project.property('mod.target-mc')
+    }
+}
+
+jar {
+    archiveClassifier.set 'dev'
+
+    from rootProject.file('LICENSE')
+}
+
+if (stonecutter.current().isActiveVersion()) {
+    rootProject.tasks.register('buildActive') {
+        setGroup 'project'
+
+        dependsOn tasks.getByName('build')
+    }
+
+    plugins.apply 'com.modrinth.minotaur'
+    plugins.apply 'com.matthewprenger.cursegradle'
+
+    modrinth {
+        token = TOKEN_MODRINTH
+        projectId = property('publish.modrinth.id')
+        uploadFile = remapJar
+        changelog = java.nio.file.Files.readString(rootProject.file("Changelog.md").toPath())
+        versionNumber = version
+        versionName = "v" + version
+        additionalFiles = [sourcesJar.outputs.getFiles().singleFile]
+        gameVersions = Arrays.asList(property('publish.target-mc').split(","))
+    }
+
+    rootProject.tasks.register('publishActive') {
+        setGroup 'project'
+
+        if (gradle.startParameter.taskNames.contains(it.name)) {
+            System.out.println("Type the task name to confirm (${it.name}): ")
+            try (BufferedReader input = new BufferedReader(new InputStreamReader(System.in))) {
+                if (input.readLine() != it.name)
+                    throw new GradleException('Task cancelled by user')
+            }
+        }
+
+        Task remapJarTask = tasks.getByName 'remapJar'
+        Task modrinthTask = tasks.getByName 'modrinth'
+
+        dependsOn remapJarTask, modrinthTask
+        modrinthTask.mustRunAfter remapJarTask
+    }
+}

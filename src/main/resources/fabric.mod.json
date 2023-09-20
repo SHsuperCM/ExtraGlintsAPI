@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "extraglintsapi",
+  "version": "${mod_version}",
+  "name": "Extra Glints API",
+  "description": "A simple api for adding more enchantment glints",
+  "authors": [
+    "SHsuperCM"
+  ],
+  "license": "MIT",
+  "icon": "assets/extraglintsapi/logo.png",
+  "contact": {
+    "homepage": "https://citresewn.shcm.io/",
+    "sources": "https://github.com/SHsuperCM/ExtraGlintsAPI",
+    "issues": "https://github.com/SHsuperCM/ExtraGlintsAPI/issues"
+  },
+
+  "environment": "client",
+  "accessWidener" : "extraglintsapi.accesswidener",
+  "mixins": [
+    "extraglintsapi.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "fabricloader": "*",
+    "minecraft": "${mod_target_mc}"
+  }
+}
