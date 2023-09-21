@@ -42,7 +42,7 @@ public interface ExtraGlint {
 
         Builder mipmap(boolean mipmap);
 
-        Builder runs(Consumer<ExtraGlint> before, Consumer<ExtraGlint> after);
+        Builder runs(Consumer<GlintContext> before, Consumer<GlintContext> after);
 
         ExtraGlint register();
     }

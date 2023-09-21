@@ -2,6 +2,7 @@ package shcm.shsupercm.fabric.extraglintsapi.impl;
 
 import net.minecraft.util.Identifier;
 import shcm.shsupercm.fabric.extraglintsapi.api.v0.ExtraGlint;
+import shcm.shsupercm.fabric.extraglintsapi.api.v0.GlintContext;
 
 import java.util.function.Consumer;
 
@@ -13,12 +14,17 @@ public class GlintBuilder implements ExtraGlint.Builder {
     private Identifier textureItem, textureEntity;
     private float scaleItem, scaleEntity;
     private boolean blur, mipmap;
-    private Consumer<ExtraGlint> before, after;
+    private Consumer<GlintContext> before, after;
 
     public GlintBuilder(Identifier id, boolean canBeRemoved, Consumer<ExtraGlint> registeredCallback) {
         this.id = id;
         this.canBeRemoved = canBeRemoved;
         this.registeredCallback = registeredCallback;
+        this.scale(1f)
+            .blur(true)
+            .mipmap(false)
+            .texture(null)
+            .runs(ctx -> {}, ctx -> {});
     }
 
     @Override
@@ -48,7 +54,7 @@ public class GlintBuilder implements ExtraGlint.Builder {
     }
 
     @Override
-    public GlintBuilder runs(Consumer<ExtraGlint> before, Consumer<ExtraGlint> after) {
+    public GlintBuilder runs(Consumer<GlintContext> before, Consumer<GlintContext> after) {
         this.before = before;
         this.after = after;
         return this;
