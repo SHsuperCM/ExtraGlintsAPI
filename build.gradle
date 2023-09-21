@@ -14,6 +14,10 @@ dependencies {
 
     modCompileOnly "net.fabricmc:fabric-loader:${property('deps.fabric-loader')}"
     modCompileOnly "net.fabricmc.fabric-api:fabric-api:${property('deps.fabric-api')}"
+
+    // testing mods
+    modRuntimeOnly "net.fabricmc:fabric-loader:${property('deps.fabric-loader')}"
+    modRuntimeOnly "net.fabricmc.fabric-api:fabric-api:${property('deps.fabric-api')}"
 }
 
 fletchingTable {
@@ -23,7 +27,6 @@ fletchingTable {
 loom {
     accessWidenerPath = file("../../src/main/resources/extraglintsapi.accesswidener")
 
-    runConfigs.client.ideConfigGenerated = false
     runConfigs.server.ideConfigGenerated = false
 }
 
