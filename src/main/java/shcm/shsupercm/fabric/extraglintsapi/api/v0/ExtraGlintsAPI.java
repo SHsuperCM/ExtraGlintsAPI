@@ -1,5 +1,6 @@
 package shcm.shsupercm.fabric.extraglintsapi.api.v0;
 
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.util.Identifier;
 import shcm.shsupercm.fabric.extraglintsapi.impl.ExtraGlintsAPIImpl;
 
@@ -59,6 +60,13 @@ public interface ExtraGlintsAPI {
     void apply(ExtraGlint... glints);
 
     /**
+     * Resets the glints to vanilla behavior.
+     */
+    default void reset() {
+        apply(vanillaGlint());
+    }
+
+    /**
      * Same as {@link #apply(ExtraGlint...)} but safely wraps a render task.
      * @see #apply(ExtraGlint...)
      * @param render a function to run with the given glints applied
@@ -69,7 +77,14 @@ public interface ExtraGlintsAPI {
         try {
             render.run();
         } finally {
-            apply(vanillaGlint());
+            reset();
         }
     }
+
+    /**
+     * Redirects the given vertex consumer to the api's consumer if needed.
+     * @param vertexConsumer original vertex consumer to be used
+     * @return Extra Glints API's own vertex consumer or {@code vertexConsumer} if not needed
+     */
+    VertexConsumer redirect(VertexConsumer vertexConsumer);
 }

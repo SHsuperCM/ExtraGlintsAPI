@@ -1,5 +1,6 @@
 package shcm.shsupercm.fabric.extraglintsapi.impl;
 
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.util.Identifier;
 import shcm.shsupercm.fabric.extraglintsapi.api.v0.ExtraGlint;
 import shcm.shsupercm.fabric.extraglintsapi.api.v0.ExtraGlintsAPI;
@@ -9,12 +10,17 @@ import java.util.Map;
 import java.util.Set;
 
 public class ExtraGlintsAPIImpl implements ExtraGlintsAPI {
+    private final ExtraGlint vanillaGlint = new GlintLayerRegistry.VanillaGlint();
+
     private final Map<Identifier, ExtraGlint> registeredGlints = new HashMap<>();
-    private final ExtraGlint vanillaGlint = newGlint(Identifier.of("minecraft", "enchanted"))
+    private ExtraGlint[] activeGlints;
+    private boolean notVanilla;
 
-            .register();
-
-    private ExtraGlint[] activeGlints = new ExtraGlint[] { vanillaGlint };
+    {
+        registeredGlints.put(vanillaGlint.id(), vanillaGlint);
+        activeGlints = new ExtraGlint[] { vanillaGlint };
+        notVanilla = false;
+    }
 
     @Override
     public ExtraGlint.Builder newGlint(Identifier id) {
@@ -51,5 +57,15 @@ public class ExtraGlintsAPIImpl implements ExtraGlintsAPI {
     @Override
     public void apply(ExtraGlint... glints) {
         this.activeGlints = glints;
+        this.notVanilla = glints.length != 1 || glints[0] != this.vanillaGlint;
+    }
+
+    @Override
+    public VertexConsumer redirect(VertexConsumer vertexConsumer) {
+        if (notVanilla) {
+
+        }
+
+        return vertexConsumer;
     }
 }
