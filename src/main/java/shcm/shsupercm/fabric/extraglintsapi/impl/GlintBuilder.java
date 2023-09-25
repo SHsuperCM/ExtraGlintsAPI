@@ -9,14 +9,14 @@ import java.util.function.Consumer;
 public class GlintBuilder implements ExtraGlint.Builder {
     private final Identifier id;
     private final boolean canBeRemoved;
-    private final Consumer<ExtraGlint> registeredCallback;
+    private final Consumer<ExtraGlintImpl> registeredCallback;
 
     private Identifier textureItem, textureEntity;
     private float scaleItem, scaleEntity;
     private boolean blur, mipmap;
     private Consumer<GlintContext> before, after;
 
-    public GlintBuilder(Identifier id, boolean canBeRemoved, Consumer<ExtraGlint> registeredCallback) {
+    public GlintBuilder(Identifier id, boolean canBeRemoved, Consumer<ExtraGlintImpl> registeredCallback) {
         this.id = id;
         this.canBeRemoved = canBeRemoved;
         this.registeredCallback = registeredCallback;
@@ -63,7 +63,6 @@ public class GlintBuilder implements ExtraGlint.Builder {
     @Override
     public ExtraGlint register() {
         ExtraGlintImpl glint = new ExtraGlintImpl(this.id, this.canBeRemoved, this.textureItem, this.textureEntity, this.scaleItem, this.scaleEntity, this.blur, this.mipmap, this.before, this.after);
-
         registeredCallback.accept(glint);
         return glint;
     }

@@ -10,16 +10,29 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 public class GlintLayerRegistry {
+    private static Map<RenderLayer, BufferBuilder> registeredLayers;
     private static final Map<BufferBuilder, RenderLayer> vanillaLayersByBuilders = new IdentityHashMap<>();
 
     public static void loadLayers(Map<RenderLayer, BufferBuilder> vanillaLayers) {
+        registeredLayers = vanillaLayers;
         for (Map.Entry<RenderLayer, BufferBuilder> entry : vanillaLayers.entrySet()) {
             if (((RenderPhaseAccessor) entry.getKey()).getName().contains("glint")) {
                 vanillaLayersByBuilders.put(entry.getValue(), entry.getKey());
             }
         }
+    }
 
+    public static ExtraGlintImpl register(ExtraGlintImpl extraGlint) {
+        for (RenderLayer vanillaLayer : vanillaLayersByBuilders.values()) {
+            RenderLayer newLayer = extraGlint.copyOfLayer(vanillaLayer);
+            registeredLayers.put(newLayer, new BufferBuilder(newLayer.getExpectedBufferSize()));
+        }
+        return extraGlint;
+    }
 
+    public static void unregister(ExtraGlintImpl extraGlint) {
+        for (RenderLayer layer : extraGlint.layers.values())
+            registeredLayers.remove(layer);
     }
 
     public static class VanillaGlint extends ExtraGlintImpl {
@@ -34,6 +47,9 @@ public class GlintLayerRegistry {
                   false,
                   ctx -> {},
                   ctx -> {});
+
+            for (RenderLayer layer : vanillaLayersByBuilders.values())
+                this.layers.put(layer, layer);
         }
     }
 }

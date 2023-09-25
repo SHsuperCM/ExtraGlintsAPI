@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class ExtraGlintsAPIImpl implements ExtraGlintsAPI {
-    private final ExtraGlint vanillaGlint = new GlintLayerRegistry.VanillaGlint();
+    private final ExtraGlintImpl vanillaGlint = new GlintLayerRegistry.VanillaGlint();
 
-    private final Map<Identifier, ExtraGlint> registeredGlints = new HashMap<>();
+    private final Map<Identifier, ExtraGlintImpl> registeredGlints = new HashMap<>();
     private ExtraGlint[] activeGlints;
     private boolean notVanilla;
 
@@ -24,12 +24,18 @@ public class ExtraGlintsAPIImpl implements ExtraGlintsAPI {
 
     @Override
     public ExtraGlint.Builder newGlint(Identifier id) {
-        return new GlintBuilder(id, false, newGlint -> registeredGlints.put(newGlint.id(), newGlint));
+        return new GlintBuilder(id, false, newGlint -> {
+            GlintLayerRegistry.register(newGlint);
+            registeredGlints.put(newGlint.id(), newGlint);
+        });
     }
 
     @Override
     public ExtraGlint.Builder newTemporaryGlint(Identifier id) {
-        return new GlintBuilder(id, true, newGlint -> registeredGlints.put(newGlint.id(), newGlint));
+        return new GlintBuilder(id, true, newGlint -> {
+            GlintLayerRegistry.register(newGlint);
+            registeredGlints.put(newGlint.id(), newGlint);
+        });
     }
 
     @Override
@@ -39,9 +45,14 @@ public class ExtraGlintsAPIImpl implements ExtraGlintsAPI {
 
     @Override
     public void removeGlint(Identifier id) {
-        ExtraGlint removed = this.registeredGlints.remove(id);
-        if (removed != null && !((ExtraGlintImpl) removed).canBeRemoved())
-            throw new RuntimeException("Tried to remove a non-temporary extra glint!");
+        ExtraGlintImpl removed = this.registeredGlints.remove(id);
+        if (removed != null) {
+            if (!removed.canBeRemoved())
+                throw new RuntimeException("Tried to remove a non-temporary extra glint!");
+
+            GlintLayerRegistry.unregister(removed);
+            removed.layers.clear();
+        }
     }
 
     @Override
