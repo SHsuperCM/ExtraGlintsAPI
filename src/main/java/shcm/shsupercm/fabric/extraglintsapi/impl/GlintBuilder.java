@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 public class GlintBuilder implements ExtraGlint.Builder {
     private final Identifier id;
-    private final boolean canBeRemoved;
+    private final boolean temporary;
     private final Consumer<ExtraGlintImpl> registeredCallback;
 
     private Identifier textureItem, textureEntity;
@@ -16,9 +16,9 @@ public class GlintBuilder implements ExtraGlint.Builder {
     private boolean blur, mipmap;
     private Consumer<GlintContext> before, after;
 
-    public GlintBuilder(Identifier id, boolean canBeRemoved, Consumer<ExtraGlintImpl> registeredCallback) {
+    public GlintBuilder(Identifier id, boolean temporary, Consumer<ExtraGlintImpl> registeredCallback) {
         this.id = id;
-        this.canBeRemoved = canBeRemoved;
+        this.temporary = temporary;
         this.registeredCallback = registeredCallback;
         this.scale(1f)
             .blur(true)
@@ -62,7 +62,10 @@ public class GlintBuilder implements ExtraGlint.Builder {
 
     @Override
     public ExtraGlint register() {
-        ExtraGlintImpl glint = new ExtraGlintImpl(this.id, this.canBeRemoved, this.textureItem, this.textureEntity, this.scaleItem, this.scaleEntity, this.blur, this.mipmap, this.before, this.after);
+        class TemporaryCounter {
+            public static long tempNumber = 0;
+        }
+        ExtraGlintImpl glint = new ExtraGlintImpl(this.temporary ? this.id.withSuffixedPath("-" + TemporaryCounter.tempNumber++) : this.id, this.temporary, this.textureItem, this.textureEntity, this.scaleItem, this.scaleEntity, this.blur, this.mipmap, this.before, this.after);
         registeredCallback.accept(glint);
         return glint;
     }

@@ -31,6 +31,7 @@ loom {
 
     runConfigs.server.ideConfigGenerated = false
 }
+validateAccessWidener.enabled = false
 
 java {
     withSourcesJar()

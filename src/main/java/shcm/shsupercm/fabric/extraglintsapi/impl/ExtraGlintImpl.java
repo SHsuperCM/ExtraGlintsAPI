@@ -1,9 +1,12 @@
 package shcm.shsupercm.fabric.extraglintsapi.impl;
 
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
 import shcm.shsupercm.fabric.extraglintsapi.api.v0.ExtraGlint;
 import shcm.shsupercm.fabric.extraglintsapi.api.v0.GlintContext;
+import shcm.shsupercm.fabric.extraglintsapi.api.v0.MultiPhaseParametersCloneBuilder;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -34,9 +37,14 @@ public class ExtraGlintImpl implements ExtraGlint {
     }
 
     public RenderLayer copyOfLayer(RenderLayer originalLayer) {
-        RenderLayer newLayer = null;
-        this.layers.put(originalLayer, newLayer);
-        return newLayer;
+        if (originalLayer instanceof RenderLayer.MultiPhase multiPhase) {
+            RenderLayer newLayer = RenderLayer.of(multiPhase.name + ":" + id.toString(), VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 256, ((MultiPhaseParametersCloneBuilder) (Object) multiPhase.getPhases()).extraglintsapi$clone()
+
+                    .build(multiPhase.isOutline()));
+
+            this.layers.put(originalLayer, newLayer);
+            return newLayer;
+        } else throw new IllegalArgumentException("Can only copy multiphase layers.");
     }
 
     @Override
