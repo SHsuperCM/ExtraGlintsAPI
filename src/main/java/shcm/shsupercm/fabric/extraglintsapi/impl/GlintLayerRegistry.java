@@ -4,7 +4,6 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.util.Identifier;
-import shcm.shsupercm.fabric.extraglintsapi.mixin.RenderPhaseAccessor;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -16,7 +15,7 @@ public class GlintLayerRegistry {
     public static void loadLayers(Map<RenderLayer, BufferBuilder> vanillaLayers) {
         registeredLayers = vanillaLayers;
         for (Map.Entry<RenderLayer, BufferBuilder> entry : vanillaLayers.entrySet()) {
-            if (((RenderPhaseAccessor) entry.getKey()).getName().contains("glint")) {
+            if (entry.getKey().name.contains("glint")) {
                 vanillaLayersByBuilders.put(entry.getValue(), entry.getKey());
             }
         }
