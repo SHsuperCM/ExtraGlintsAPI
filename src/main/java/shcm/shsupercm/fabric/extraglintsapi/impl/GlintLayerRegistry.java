@@ -2,6 +2,7 @@ package shcm.shsupercm.fabric.extraglintsapi.impl;
 
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.util.Identifier;
 
@@ -32,6 +33,15 @@ public class GlintLayerRegistry {
     public static void unregister(ExtraGlintImpl extraGlint) {
         for (RenderLayer layer : extraGlint.layers.values())
             registeredLayers.remove(layer);
+    }
+
+    public static RenderLayer getVanillaLayer(VertexConsumer vertexConsumer) {
+        //noinspection SuspiciousMethodCalls
+        return vanillaLayersByBuilders.get(vertexConsumer);
+    }
+
+    public static VertexConsumer getVertexConsumer(RenderLayer renderLayer) {
+        return registeredLayers.get(renderLayer);
     }
 
     public static class VanillaGlint extends ExtraGlintImpl {

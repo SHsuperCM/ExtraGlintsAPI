@@ -1,6 +1,8 @@
 package shcm.shsupercm.fabric.extraglintsapi.impl;
 
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumers;
 import net.minecraft.util.Identifier;
 import shcm.shsupercm.fabric.extraglintsapi.api.v0.ExtraGlint;
 import shcm.shsupercm.fabric.extraglintsapi.api.v0.ExtraGlintsAPI;
@@ -74,7 +76,20 @@ public class ExtraGlintsAPIImpl implements ExtraGlintsAPI {
     @Override
     public VertexConsumer redirect(VertexConsumer vertexConsumer) {
         if (notVanilla) {
+            if (activeGlints.length == 0)
+                return EmptyVertexConsumer.INSTANCE;
 
+            RenderLayer vanillaLayer = GlintLayerRegistry.getVanillaLayer(vertexConsumer);
+
+            if (activeGlints.length == 1)
+                return GlintLayerRegistry.getVertexConsumer(((ExtraGlintImpl) activeGlints[0]).layers.get(vanillaLayer));
+
+            VertexConsumer[] consumers = new VertexConsumer[activeGlints.length];
+
+            for (int i = 0; i < activeGlints.length; i++)
+                consumers[i] = GlintLayerRegistry.getVertexConsumer(((ExtraGlintImpl) activeGlints[i]).layers.get(vanillaLayer));
+
+            return consumers.length == 2 ? VertexConsumers.union(consumers[0], consumers[1]) : VertexConsumers.union(consumers);
         }
 
         return vertexConsumer;
