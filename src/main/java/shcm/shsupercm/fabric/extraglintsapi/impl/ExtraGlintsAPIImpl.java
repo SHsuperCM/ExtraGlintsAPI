@@ -75,22 +75,22 @@ public class ExtraGlintsAPIImpl implements ExtraGlintsAPI {
 
     @Override
     public VertexConsumer redirect(VertexConsumer vertexConsumer) {
-        if (notVanilla) {
-            if (activeGlints.length == 0)
-                return EmptyVertexConsumer.INSTANCE;
-
-            RenderLayer vanillaLayer = GlintLayerRegistry.getVanillaLayer(vertexConsumer);
-
-            if (activeGlints.length == 1)
-                return GlintLayerRegistry.getVertexConsumer(((ExtraGlintImpl) activeGlints[0]).layers.get(vanillaLayer));
-
-            VertexConsumer[] consumers = new VertexConsumer[activeGlints.length];
-
-            for (int i = 0; i < activeGlints.length; i++)
-                consumers[i] = GlintLayerRegistry.getVertexConsumer(((ExtraGlintImpl) activeGlints[i]).layers.get(vanillaLayer));
-
-            return consumers.length == 2 ? VertexConsumers.union(consumers[0], consumers[1]) : VertexConsumers.union(consumers);
-        }
+        RenderLayer vanillaLayer = GlintLayerRegistry.getVanillaLayer(vertexConsumer);
+        if (notVanilla && vanillaLayer != null)
+            return switch (activeGlints.length) {
+                case 0 -> EmptyVertexConsumer.INSTANCE;
+                case 1 -> GlintLayerRegistry.getVertexConsumer(((ExtraGlintImpl) activeGlints[0]).layers.get(vanillaLayer));
+                case 2 -> VertexConsumers.union(
+                        GlintLayerRegistry.getVertexConsumer(((ExtraGlintImpl) activeGlints[0]).layers.get(vanillaLayer)),
+                        GlintLayerRegistry.getVertexConsumer(((ExtraGlintImpl) activeGlints[1]).layers.get(vanillaLayer))
+                );
+                default -> {
+                    VertexConsumer[] consumers = new VertexConsumer[activeGlints.length];
+                    for (int i = 0; i < activeGlints.length; i++)
+                        consumers[i] = GlintLayerRegistry.getVertexConsumer(((ExtraGlintImpl) activeGlints[i]).layers.get(vanillaLayer));
+                    yield VertexConsumers.union(consumers);
+                }
+            };
 
         return vertexConsumer;
     }
