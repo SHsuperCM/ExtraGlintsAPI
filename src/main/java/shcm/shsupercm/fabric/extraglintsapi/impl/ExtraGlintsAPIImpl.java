@@ -3,6 +3,7 @@ package shcm.shsupercm.fabric.extraglintsapi.impl;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumers;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.util.Identifier;
 import shcm.shsupercm.fabric.extraglintsapi.api.v0.ExtraGlint;
 import shcm.shsupercm.fabric.extraglintsapi.api.v0.ExtraGlintsAPI;
@@ -12,17 +13,20 @@ import java.util.Map;
 import java.util.Set;
 
 public class ExtraGlintsAPIImpl implements ExtraGlintsAPI {
-    private final ExtraGlintImpl vanillaGlint = new GlintLayerRegistry.VanillaGlint();
+    private final ExtraGlintImpl vanillaGlint = new ExtraGlintImpl(new Identifier("minecraft", "glint"),
+            false,
+            ItemRenderer.ITEM_ENCHANTMENT_GLINT,
+            ItemRenderer.ENTITY_ENCHANTMENT_GLINT,
+            8f,
+            0.16f,
+            true,
+            false,
+            ctx -> {},
+            ctx -> {});
 
-    private final Map<Identifier, ExtraGlintImpl> registeredGlints = new HashMap<>();
-    private ExtraGlint[] activeGlints;
-    private boolean notVanilla;
-
-    {
-        registeredGlints.put(vanillaGlint.id(), vanillaGlint);
-        activeGlints = new ExtraGlint[] { vanillaGlint };
-        notVanilla = false;
-    }
+    private final Map<Identifier, ExtraGlintImpl> registeredGlints = new HashMap<>(Map.of(vanillaGlint.id(), vanillaGlint));
+    private ExtraGlint[] activeGlints = new ExtraGlint[] { vanillaGlint };
+    private boolean notVanilla = false;
 
     @Override
     public ExtraGlint.Builder newGlint(Identifier id) {
